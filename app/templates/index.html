@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signal Broadcaster</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #20B2AA;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            width: 650px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            height: 45px;
+        }
+        .select2-container .select2-selection--single {
+            height: 45px;
+            padding: 5px 10px;
+        }
+        .btn {
+            width: 30%;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 12px;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        #message {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h3 class="text-center mb-4">📡 Signal Broadcaster</h3>
+
+    <form id="signalForm">
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <input type="text" name="field1" id="field1" class="form-control" placeholder="Time" required>
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="field2" id="field2" class="form-control" placeholder="Price" required>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select select2" id="dropdown" name="dropdown_value" required>
+                    <option value="">Select Symbol</option>
+                    {% for item in dropdown_list %}
+                        <option value="{{ item }}">{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-dark" onclick="sendSignal('submit')">Submit</button>
+            <button type="button" class="btn btn-success" onclick="sendSignal('up')">Up</button>
+            <button type="button" class="btn btn-danger" onclick="sendSignal('down')">Down</button>
+        </div>
+        <div id="message"></div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Select Symbol",
+            allowClear: true
+        });
+    });
+
+    function sendSignal(action) {
+        const field1 = document.getElementById('field1').value;
+        const field2 = document.getElementById('field2').value;
+        const dropdown = document.getElementById('dropdown').value;
+        const messageDiv = document.getElementById('message');
+
+        if (!field1 || !field2 || !dropdown) {
+            messageDiv.innerHTML = `<div class="alert alert-warning">All fields are required</div>`;
+            return;
+        }
+
+        fetch('/send-signal', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action, field1, field2, dropdown_value: dropdown })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            } else {
+                messageDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
+        })
+        .catch(err => {
+            messageDiv.innerHTML = `<div class="alert alert-danger">Error sending signal</div>`;
+        });
+    }
+</script>
+</body>
+</html>
