@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, jsonify
 from . import socketio
 from flask_socketio import disconnect
+import json
 
 bp = Blueprint('main', __name__)
 dropdown_list = ['NIFTY', 'BANKNIFTY', 'TCS', 'INFY', 'RELIANCE', 'ICICIBANK', 'SBIN']
@@ -31,9 +32,12 @@ def send_signal():
     except Exception as e:
         return jsonify({"status": "error", "message": f"Failed to send signal: {str(e)}"})
 
-# Load tokens
-with open('allowed_tokens.txt', 'r') as f:
-    allowed_tokens = set(line.strip() for line in f)
+# Load tokens from JSON
+with open('allowed_tokens.json', 'r') as f:
+    data = json.load(f)
+
+# Extract all values
+allowed_tokens = list(data.values())
 
 @socketio.on('connect')
 def handle_connect(auth):
