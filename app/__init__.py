@@ -13,5 +13,5 @@ def create_app():
     from .routes import bp
     app.register_blueprint(bp)
 
-    socketio.init_app(app)
+    socketio.init_app(app, async_mode='eventlet')
     return app

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify
 from . import socketio
+
 bp = Blueprint('main', __name__)
 dropdown_list = ['NIFTY', 'BANKNIFTY', 'TCS', 'INFY', 'RELIANCE', 'ICICIBANK', 'SBIN']
 
