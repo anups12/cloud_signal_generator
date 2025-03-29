@@ -42,6 +42,7 @@ allowed_tokens = list(data.values())
 @socketio.on('connect')
 def handle_connect(auth):
     token = auth.get('token') if auth else None
+    print(f"Allowed Tokens {allowed_tokens}")
     if token not in allowed_tokens:
         print(f"Unauthorized Connection Attempt: {token}")
         disconnect()
