@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 from dotenv import load_dotenv
 import os
 
-socketio = SocketIO(cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*", ping_timeout=30, ping_interval=10)
 
 def create_app():
     load_dotenv()
